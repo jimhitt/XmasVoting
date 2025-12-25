@@ -5,6 +5,11 @@
 // - Execute as: Me
 // - Who has access: Anyone
 
+function doOptions(e) {
+  // Handle preflight CORS requests
+  return createCorsResponse({});
+}
+
 function doPost(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -71,6 +76,49 @@ function doPost(e) {
 function doGet(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    if (e.parameter.action === 'submitVote') {
+      // Handle vote submission via GET request to avoid CORS issues
+      const voter = e.parameter.voter;
+
+      // Validate voter name
+      if (!voter || typeof voter !== 'string' || voter.length > 100) {
+        return createCorsResponse({
+          status: 'error',
+          message: 'Invalid voter name'
+        });
+      }
+
+      // Validate and sanitize vote values
+      const validateScore = (score) => {
+        const num = parseInt(score);
+        if (isNaN(num)) return 50;
+        return Math.min(100, Math.max(0, num));
+      };
+
+      const skiing = validateScore(e.parameter.skiing);
+      const kyoto = validateScore(e.parameter.kyoto);
+      const kanazawa = validateScore(e.parameter.kanazawa);
+
+      // Check if voter already has a vote
+      const existingRow = findVoterRow(sheet, voter);
+
+      const timestamp = new Date();
+      const rowData = [timestamp, voter, skiing, kyoto, kanazawa];
+
+      if (existingRow > 0) {
+        // Update existing vote
+        sheet.getRange(existingRow, 1, 1, rowData.length).setValues([rowData]);
+      } else {
+        // Add new vote
+        sheet.appendRow(rowData);
+      }
+
+      return createCorsResponse({
+        status: 'success',
+        message: 'Vote recorded'
+      });
+    }
 
     if (e.parameter.action === 'getVotes') {
       const data = sheet.getDataRange().getValues();
@@ -143,8 +191,6 @@ function setupSheet() {
 
 // Helper function to create CORS-enabled responses
 function createCorsResponse(data) {
-  const output = ContentService.createTextOutput(JSON.stringify(data))
+  return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
-
-  return output;
 }
