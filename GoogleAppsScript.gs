@@ -13,18 +13,18 @@ function doPost(e) {
     if (data.action === 'submitVote') {
       // Validate voter name
       if (!data.voter || typeof data.voter !== 'string' || data.voter.length > 100) {
-        return ContentService.createTextOutput(JSON.stringify({
+        return createCorsResponse({
           status: 'error',
           message: 'Invalid voter name'
-        })).setMimeType(ContentService.MimeType.JSON);
+        });
       }
 
       // Validate votes object
       if (!data.votes || typeof data.votes !== 'object') {
-        return ContentService.createTextOutput(JSON.stringify({
+        return createCorsResponse({
           status: 'error',
           message: 'Invalid votes data'
-        })).setMimeType(ContentService.MimeType.JSON);
+        });
       }
 
       // Validate and sanitize vote values
@@ -54,30 +54,30 @@ function doPost(e) {
         sheet.appendRow(rowData);
       }
 
-      return ContentService.createTextOutput(JSON.stringify({
+      return createCorsResponse({
         status: 'success',
         message: 'Vote recorded'
-      })).setMimeType(ContentService.MimeType.JSON);
+      });
     }
 
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return createCorsResponse({
       status: 'error',
       message: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
+    });
   }
 }
 
 function doGet(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
+
     if (e.parameter.action === 'getVotes') {
       const data = sheet.getDataRange().getValues();
-      
+
       // Skip header row if it exists
       const startRow = (data[0][0] === 'Timestamp') ? 1 : 0;
-      
+
       const votes = [];
       for (let i = startRow; i < data.length; i++) {
         if (data[i][1]) { // If voter name exists
@@ -90,18 +90,18 @@ function doGet(e) {
           });
         }
       }
-      
-      return ContentService.createTextOutput(JSON.stringify({
+
+      return createCorsResponse({
         status: 'success',
         votes: votes
-      })).setMimeType(ContentService.MimeType.JSON);
+      });
     }
-    
+
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return createCorsResponse({
       status: 'error',
       message: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
+    });
   }
 }
 
@@ -117,26 +117,34 @@ function findVoterRow(sheet, voterName) {
 
 function setupSheet() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  
+
   // Set up header row
   const headers = ['Timestamp', 'Voter', 'Skiing in Shiga Kogen', 'Culture in Kyoto', 'Samurai History in Kanazawa'];
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  
+
   // Format header
   sheet.getRange(1, 1, 1, headers.length)
     .setFontWeight('bold')
     .setBackground('#667eea')
     .setFontColor('#ffffff');
-  
+
   // Set column widths
   sheet.setColumnWidth(1, 150); // Timestamp
   sheet.setColumnWidth(2, 100); // Voter
   sheet.setColumnWidth(3, 180); // Activity 1
   sheet.setColumnWidth(4, 180); // Activity 2
   sheet.setColumnWidth(5, 200); // Activity 3
-  
+
   // Freeze header row
   sheet.setFrozenRows(1);
-  
+
   Logger.log('Sheet setup complete!');
+}
+
+// Helper function to create CORS-enabled responses
+function createCorsResponse(data) {
+  const output = ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+
+  return output;
 }
