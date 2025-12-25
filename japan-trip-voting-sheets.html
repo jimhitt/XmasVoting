@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japan Trip Activity Voting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .voter-select {
+            margin-bottom: 30px;
+        }
+
+        .voter-select label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .voter-select select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .activity {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            transition: transform 0.2s;
+        }
+
+        .activity:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .activity-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        .emoji-display {
+            font-size: 3em;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #ff4444, #ffaa44, #44ff44);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .slider-labels span {
+            max-width: 30%;
+            text-align: center;
+        }
+
+        .slider-labels .left { text-align: left; }
+        .slider-labels .right { text-align: right; }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .view-results-btn {
+            background: #764ba2;
+            color: white;
+        }
+
+        .view-results-btn:hover:not(:disabled) {
+            background: #63408a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .result-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .result-item h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .vote-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .vote-name {
+            width: 100px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .vote-visual {
+            flex-grow: 1;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vote-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .vote-emoji {
+            font-size: 1.5em;
+        }
+
+        .vote-score {
+            font-size: 0.9em;
+            color: #666;
+            min-width: 30px;
+        }
+
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .average-score {
+            text-align: right;
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .sheet-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .sheet-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .sheet-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="votingView">
+            <h1>🗾 Japan Trip Voting</h1>
+            <p class="subtitle">Help us plan the perfect adventure!</p>
+
+            <div class="voter-select">
+                <label for="voterName">Who's voting?</label>
+                <select id="voterName" onchange="checkExistingVote()">
+                    <option value="">Select your name...</option>
+                    <option value="Jim">Jim</option>
+                    <option value="Meg">Meg</option>
+                    <option value="James">James</option>
+                    <option value="Andrew">Andrew</option>
+                </select>
+            </div>
+
+            <div id="activities"></div>
+
+            <div id="message"></div>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Submitting your votes...</p>
+            </div>
+
+            <div class="buttons">
+                <button class="submit-btn" onclick="submitVote()" id="submitBtn">Submit My Votes</button>
+                <button class="view-results-btn" onclick="showResults()" id="resultsBtn">View Results</button>
+            </div>
+        </div>
+
+        <div id="resultsView" class="results-container">
+            <button class="back-btn" onclick="showVoting()">← Back to Voting</button>
+            <h1>📊 Voting Results</h1>
+            <div id="loadingResults" class="loading">
+                <div class="spinner"></div>
+                <p>Loading results...</p>
+            </div>
+            <div id="results"></div>
+            <div class="sheet-link">
+                <a href="SPREADSHEET_URL_HERE" target="_blank">📊 View Full Spreadsheet</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: Replace this with your Google Apps Script web app URL
+        const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+        
+        const activities = [
+            { id: 'skiing', name: 'Skiing in Shiga Kogen', emojis: ['😱', '😐', '😊', '🤩', '⛷️'] },
+            { id: 'kyoto', name: 'Culture in Kyoto', emojis: ['😱', '😐', '😊', '🤩', '⛩️'] },
+            { id: 'kanazawa', name: 'Samurai History in Kanazawa', emojis: ['😱', '😐', '😊', '🤩', '⚔️'] }
+        ];
+
+        const labels = [
+            "You couldn't pay me enough",
+            "Meh",
+            "We have to do that or I will rage"
+        ];
+
+        function initActivities() {
+            const container = document.getElementById('activities');
+            container.innerHTML = '';
+
+            activities.forEach(activity => {
+                const div = document.createElement('div');
+                div.className = 'activity';
+                div.innerHTML = `
+                    <div class="activity-header">
+                        <div class="activity-name">${activity.name}</div>
+                        <div class="emoji-display" id="emoji-${activity.id}">😐</div>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="50" 
+                               class="slider" id="slider-${activity.id}"
+                               oninput="updateEmoji('${activity.id}', this.value)">
+                        <div class="slider-labels">
+                            <span class="left">${labels[0]}</span>
+                            <span>${labels[1]}</span>
+                            <span class="right">${labels[2]}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateEmoji(activityId, value) {
+            const activity = activities.find(a => a.id === activityId);
+            const emojiDisplay = document.getElementById(`emoji-${activityId}`);
+            
+            const index = Math.floor((value / 100) * (activity.emojis.length - 1));
+            emojiDisplay.textContent = activity.emojis[index];
+        }
+
+        function checkExistingVote() {
+            const voterName = document.getElementById('voterName').value;
+            if (!voterName) return;
+
+            // Check localStorage for previous vote
+            const savedVotes = JSON.parse(localStorage.getItem('myVote_' + voterName) || 'null');
+            if (savedVotes) {
+                showMessage(`Loading your previous votes, ${voterName}!`, 'info');
+                activities.forEach(activity => {
+                    const slider = document.getElementById(`slider-${activity.id}`);
+                    if (savedVotes[activity.id] !== undefined) {
+                        slider.value = savedVotes[activity.id];
+                        updateEmoji(activity.id, savedVotes[activity.id]);
+                    }
+                });
+            }
+        }
+
+        async function submitVote() {
+            const voterName = document.getElementById('voterName').value;
+            
+            if (!voterName) {
+                showMessage('Please select your name first!', 'warning');
+                return;
+            }
+
+            // Validate script URL
+            if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                showMessage('Error: Google Apps Script URL not configured. Please update SCRIPT_URL in the code.', 'error');
+                return;
+            }
+
+            const votes = {};
+            activities.forEach(activity => {
+                const slider = document.getElementById(`slider-${activity.id}`);
+                votes[activity.id] = parseInt(slider.value);
+            });
+
+            // Save to localStorage as backup
+            localStorage.setItem('myVote_' + voterName, JSON.stringify(votes));
+
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'submitVote',
+                        voter: voterName,
+                        votes: votes
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMessage(`Thanks ${voterName}! Your votes have been recorded.`, 'success');
+                } else {
+                    throw new Error(result.message || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error submitting vote:', error);
+                showMessage('Error submitting votes. Please check your internet connection and try again.', 'error');
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        async function showResults() {
+            document.getElementById('votingView').style.display = 'none';
+            document.getElementById('resultsView').classList.add('active');
+            document.getElementById('loadingResults').classList.add('active');
+            document.getElementById('results').innerHTML = '';
+
+            // Validate script URL
+            if (SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                document.getElementById('loadingResults').classList.remove('active');
+                document.getElementById('results').innerHTML = '<p class="message error">Google Apps Script URL not configured.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getVotes');
+                const data = await response.json();
+
+                document.getElementById('loadingResults').classList.remove('active');
+
+                if (!data.votes || data.votes.length === 0) {
+                    document.getElementById('results').innerHTML = '<p class="message warning">No votes recorded yet!</p>';
+                    return;
+                }
+
+                displayResults(data.votes);
+                
+            } catch (error) {
+                console.error('Error fetching results:', error);
+                document.getElementById('loadingResults').classList.remove('active');
+                document.getElementById('results').innerHTML = '<p class="message error">Error loading results. Please try again.</p>';
+            }
+        }
+
+        function displayResults(votesData) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            // Organize votes by activity
+            const votesByActivity = {};
+            activities.forEach(activity => {
+                votesByActivity[activity.id] = {
+                    name: activity.name,
+                    emojis: activity.emojis,
+                    votes: []
+                };
+            });
+
+            // Parse votes from spreadsheet
+            votesData.forEach(row => {
+                const voter = row.voter;
+                activities.forEach(activity => {
+                    if (row[activity.id] !== undefined) {
+                        votesByActivity[activity.id].votes.push({
+                            voter: voter,
+                            score: row[activity.id]
+                        });
+                    }
+                });
+            });
+
+            // Display results for each activity
+            activities.forEach(activity => {
+                const activityData = votesByActivity[activity.id];
+                const div = document.createElement('div');
+                div.className = 'result-item';
+
+                const h3 = document.createElement('h3');
+                h3.textContent = activity.name;
+                div.appendChild(h3);
+
+                let totalScore = 0;
+                let voteCount = 0;
+
+                activityData.votes.forEach(vote => {
+                    const score = Math.min(100, Math.max(0, parseInt(vote.score) || 0));
+                    const emojiIndex = Math.floor((score / 100) * (activity.emojis.length - 1));
+                    const emoji = activity.emojis[emojiIndex];
+                    const color = `hsl(${score * 1.2}, 70%, 50%)`;
+
+                    totalScore += score;
+                    voteCount++;
+
+                    const voteBar = document.createElement('div');
+                    voteBar.className = 'vote-bar';
+
+                    const voteName = document.createElement('div');
+                    voteName.className = 'vote-name';
+                    voteName.textContent = vote.voter;
+
+                    const voteVisual = document.createElement('div');
+                    voteVisual.className = 'vote-visual';
+
+                    const voteFill = document.createElement('div');
+                    voteFill.className = 'vote-fill';
+                    voteFill.style.width = score + '%';
+                    voteFill.style.background = color;
+
+                    const voteEmoji = document.createElement('div');
+                    voteEmoji.className = 'vote-emoji';
+                    voteEmoji.textContent = emoji;
+
+                    const voteScore = document.createElement('div');
+                    voteScore.className = 'vote-score';
+                    voteScore.textContent = score;
+
+                    voteVisual.appendChild(voteFill);
+                    voteBar.appendChild(voteName);
+                    voteBar.appendChild(voteVisual);
+                    voteBar.appendChild(voteEmoji);
+                    voteBar.appendChild(voteScore);
+                    div.appendChild(voteBar);
+                });
+
+                if (voteCount > 0) {
+                    const average = Math.round(totalScore / voteCount);
+                    const avgDiv = document.createElement('div');
+                    avgDiv.className = 'average-score';
+                    avgDiv.textContent = `Average: ${average}/100`;
+                    div.appendChild(avgDiv);
+                }
+
+                resultsContainer.appendChild(div);
+            });
+        }
+
+        function showVoting() {
+            document.getElementById('votingView').style.display = 'block';
+            document.getElementById('resultsView').classList.remove('active');
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            const msgElement = document.createElement('div');
+            msgElement.className = `message ${type}`;
+            msgElement.textContent = text;
+            messageDiv.innerHTML = '';
+            messageDiv.appendChild(msgElement);
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Initialize on load
+        initActivities();
+    </script>
+</body>
+</html>
