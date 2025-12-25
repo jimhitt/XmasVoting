@@ -320,6 +320,73 @@
             margin-top: 10px;
         }
 
+        .category-header {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .category-header:first-of-type {
+            margin-top: 10px;
+        }
+
+        .activity-description {
+            color: #555;
+            line-height: 1.6;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .activity-details {
+            margin: 10px 0;
+        }
+
+        .detail-row {
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #667eea;
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .pros-cons {
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .pros-cons .pro {
+            color: #28a745;
+            margin: 8px 0;
+        }
+
+        .pros-cons .con {
+            color: #dc3545;
+            margin: 8px 0;
+        }
+
+        .pros-cons .pro::before {
+            content: "✅ ";
+            font-weight: bold;
+        }
+
+        .pros-cons .con::before {
+            content: "⚠️ ";
+            font-weight: bold;
+        }
+
+        .pros-cons .label {
+            font-weight: bold;
+        }
+
         .sheet-link {
             text-align: center;
             margin-top: 20px;
@@ -340,7 +407,7 @@
     <div class="container">
         <div id="votingView">
             <h1>🗾 Japan Trip Voting</h1>
-            <p class="subtitle">Help us plan the perfect adventure!</p>
+            <p class="subtitle">Vote on side trips (overnight stays) and day trips from Tokyo!</p>
 
             <div class="voter-select">
                 <label for="voterName">Who's voting?</label>
@@ -386,9 +453,79 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4IFq0KJUdN-ccb56zAbG4fPrhrpE-7UrcEUtZn2aXixr2-TULiyyJJkFhUyvW2fg/exec';
         
         const activities = [
-            { id: 'skiing', name: 'Skiing in Shiga Kogen', emojis: ['😱', '😐', '😊', '🤩', '⛷️'] },
-            { id: 'kyoto', name: 'Culture in Kyoto', emojis: ['😱', '😐', '😊', '🤩', '⛩️'] },
-            { id: 'kanazawa', name: 'Samurai History in Kanazawa', emojis: ['😱', '😐', '😊', '🤩', '⚔️'] }
+            // Side Trips (Overnight Stay)
+            {
+                id: 'skiing',
+                name: 'The Winter Adventure (Shiga Kogen Skiing)',
+                category: 'Side Trip',
+                description: 'A high-energy trip to Japan\'s largest interconnected ski area. You\'ll stay at the Okushiga Kogen Hotel, which offers "ski-in/ski-out" convenience. While it\'s focused on the outdoors, the region is famous for the Snow Monkeys (Jigokudani), which look like real-life Pokémon, and the nearby historic towns offer a "hidden mountain village" vibe straight out of a fantasy anime.',
+                pros: 'World-class powder snow; the "cool factor" of skiing in the Japanese Alps; visiting the iconic Snow Monkeys.',
+                cons: 'Most travel-intensive (4.5 hours each way); weather dependent; less focused on specific Samurai/Anime history.',
+                emojis: ['😱', '😐', '😊', '🤩', '⛷️']
+            },
+            {
+                id: 'kyoto',
+                name: 'The Warrior\'s Path (Kyoto)',
+                category: 'Side Trip',
+                description: 'The ultimate cultural deep-dive. Kyoto is the heart of Samurai history and the inspiration for countless anime like Demon Slayer and Samurai Champloo. You can visit a Samurai & Ninja Museum to try on armor and throw shuriken, or explore the Toei Kyoto Studio Park, an active film set where you can walk through a real-life Edo-period village and watch ninja shows.',
+                pros: 'Incredible interactive Samurai experiences; home to the Kyoto International Manga Museum; the Fushimi Inari shrines feel like a Demon Slayer training ground.',
+                cons: 'Can be very crowded; requires moving between many different sites; potentially "temple fatigue" if not balanced with enough action.',
+                emojis: ['😱', '😐', '😊', '🤩', '⛩️']
+            },
+            {
+                id: 'kanazawa',
+                name: 'The Hidden Fortress (Kanazawa)',
+                category: 'Side Trip',
+                description: 'Often called "Little Kyoto," this city is famous for its perfectly preserved Samurai District (Nagamachi) and a "Ninja Temple" (Myoryuji) filled with trapdoors and secret passages. It\'s less crowded than Kyoto and feels like a boutique adventure. The modern side includes the Pokémon Center Kanazawa (with exclusive local merchandise) and one of the world\'s most interactive contemporary art museums.',
+                pros: 'Best preserved Samurai residences you can actually enter; very easy to navigate; direct 2.5-hour bullet train from Tokyo; unique Pokémon Center.',
+                cons: 'Smaller than Kyoto with fewer total "big name" attractions; no skiing/snow activities in the city itself.',
+                emojis: ['😱', '😐', '😊', '🤩', '⚔️']
+            },
+            // Day Trips from Tokyo
+            {
+                id: 'hakone',
+                name: 'Hakone: Mountains, Crater Lakes, and Pirate Ships',
+                category: 'Day Trip',
+                description: 'A scenic journey through Fuji-Hakone-Izu National Park using a famous "loop" of diverse transportation, including a mountain railway, a cable car (ropeway) over volcanic vents, and a cruise across Lake Ashi.',
+                travelTime: '~90 to 120 minutes',
+                travelMode: 'Take the Odakyu Line from Shinjuku to Hakone-Yumoto Station. For the fastest and most comfortable journey, book the "Romancecar" limited express.',
+                pros: 'Offers iconic views of Mount Fuji (weather permitting) and the unique experience of a "Pirate Ship" cruise. The Hakone Open-Air Museum is world-class and specifically designed with interactive art installations that children can climb on.',
+                cons: 'The itinerary is highly weather-dependent; if it is cloudy, you will miss the mountain views. It is one of the most popular trips from Tokyo, so transit lines can be long on weekends.',
+                emojis: ['😱', '😐', '😊', '🤩', '🗻']
+            },
+            {
+                id: 'nikko',
+                name: 'Nikko: Shogunate History and Ninja Culture',
+                category: 'Day Trip',
+                description: 'A trip into the mountains north of Tokyo to visit the lavishly decorated Toshogu Shrine (a UNESCO World Heritage site) followed by a visit to a historical theme park.',
+                travelTime: '~120 to 140 minutes',
+                travelMode: 'Take the JR Yamanote Line to Shinjuku or Ikebukuro, then transfer to the JR-Tobu "Nikko" Limited Express which goes directly to Tobu-Nikko Station.',
+                pros: 'Provides a deep look at Japan\'s samurai history with architecture unlike anything else in the country. Edo Wonderland allows the family to dress in period costume and participate in "Ninja training," making history highly engaging for children.',
+                cons: 'Requires a longer travel time. The shrine area involves significant walking on uneven stone paths and many stairs, which may be tiring for younger travelers.',
+                emojis: ['😱', '😐', '😊', '🤩', '🥷']
+            },
+            {
+                id: 'kamakura',
+                name: 'Kamakura: Coastal Temples and Giant Buddha',
+                category: 'Day Trip',
+                description: 'Often called the "Kyoto of the East," this seaside town is home to massive bronze statues, Zen temples, and sandy beaches, all accessible via a charming vintage tram line (the Enoden).',
+                travelTime: '~55 to 70 minutes',
+                travelMode: 'Take the JR Shonan-Shinjuku Line directly from Shibuya Station to Kamakura Station.',
+                pros: 'The "Great Buddha" is an awe-inspiring sight that allows visitors to step inside the statue. The pace is significantly more relaxed than Tokyo, and the proximity to the beach provides a great space for children to play and decompress.',
+                cons: 'The main historical streets are narrow and can feel very congested. Many of the most beautiful temples are tucked away on hillsides, requiring a fair amount of uphill walking.',
+                emojis: ['😱', '😐', '😊', '🤩', '🏖️']
+            },
+            {
+                id: 'yokohama',
+                name: 'Yokohama: Modern Waterfront and Interactive Museums',
+                category: 'Day Trip',
+                description: 'A short trip to Japan\'s second-largest city, focusing on the futuristic Minato Mirai harbor district, which is famous for its interactive museums and giant Ferris wheel.',
+                travelTime: '~30 minutes',
+                travelMode: 'Take the Tokyu Toyoko Line (Express or Limited Express) directly from Shibuya Station to Minatomirai Station.',
+                pros: 'Extremely convenient and stroller-friendly. The Cup Noodles Museum (where you design your own ramen) and the Yokohama Cosmo World amusement park provide high-energy, hands-on fun that is a guaranteed hit with kids.',
+                cons: 'It lacks the "Old Japan" atmosphere found in the other locations. Much of the architecture and vibe is ultra-modern, which may feel similar to parts of Tokyo you have already explored.',
+                emojis: ['😱', '😐', '😊', '🤩', '🎡']
+            }
         ];
 
         const labels = [
@@ -401,16 +538,50 @@
             const container = document.getElementById('activities');
             container.innerHTML = '';
 
+            let currentCategory = '';
+
             activities.forEach(activity => {
+                // Add category header if it's a new category
+                if (activity.category !== currentCategory) {
+                    currentCategory = activity.category;
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'category-header';
+                    categoryHeader.textContent = currentCategory === 'Side Trip' ?
+                        '🏨 Side Trips (Overnight Stay)' :
+                        '🚆 Day Trips from Tokyo';
+                    container.appendChild(categoryHeader);
+                }
+
                 const div = document.createElement('div');
                 div.className = 'activity';
+
+                let detailsHTML = '';
+                if (activity.travelTime) {
+                    detailsHTML = `
+                        <div class="activity-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Travel Time:</span> ${activity.travelTime}
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">How to Get There:</span> ${activity.travelMode}
+                            </div>
+                        </div>
+                    `;
+                }
+
                 div.innerHTML = `
                     <div class="activity-header">
                         <div class="activity-name">${activity.name}</div>
                         <div class="emoji-display" id="emoji-${activity.id}">😐</div>
                     </div>
+                    <div class="activity-description">${activity.description}</div>
+                    ${detailsHTML}
+                    <div class="pros-cons">
+                        <div class="pro"><span class="label">Pros:</span> ${activity.pros}</div>
+                        <div class="con"><span class="label">Cons:</span> ${activity.cons}</div>
+                    </div>
                     <div class="slider-container">
-                        <input type="range" min="0" max="100" value="50" 
+                        <input type="range" min="0" max="100" value="50"
                                class="slider" id="slider-${activity.id}"
                                oninput="updateEmoji('${activity.id}', this.value)">
                         <div class="slider-labels">
@@ -484,7 +655,11 @@
                     voter: voterName,
                     skiing: votes.skiing,
                     kyoto: votes.kyoto,
-                    kanazawa: votes.kanazawa
+                    kanazawa: votes.kanazawa,
+                    hakone: votes.hakone,
+                    nikko: votes.nikko,
+                    kamakura: votes.kamakura,
+                    yokohama: votes.yokohama
                 });
 
                 const response = await fetch(SCRIPT_URL + '?' + params.toString());

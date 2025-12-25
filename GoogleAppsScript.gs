@@ -48,7 +48,11 @@ function doPost(e) {
         data.voter,
         validateScore(data.votes.skiing),
         validateScore(data.votes.kyoto),
-        validateScore(data.votes.kanazawa)
+        validateScore(data.votes.kanazawa),
+        validateScore(data.votes.hakone),
+        validateScore(data.votes.nikko),
+        validateScore(data.votes.kamakura),
+        validateScore(data.votes.yokohama)
       ];
 
       if (existingRow > 0) {
@@ -99,12 +103,16 @@ function doGet(e) {
       const skiing = validateScore(e.parameter.skiing);
       const kyoto = validateScore(e.parameter.kyoto);
       const kanazawa = validateScore(e.parameter.kanazawa);
+      const hakone = validateScore(e.parameter.hakone);
+      const nikko = validateScore(e.parameter.nikko);
+      const kamakura = validateScore(e.parameter.kamakura);
+      const yokohama = validateScore(e.parameter.yokohama);
 
       // Check if voter already has a vote
       const existingRow = findVoterRow(sheet, voter);
 
       const timestamp = new Date();
-      const rowData = [timestamp, voter, skiing, kyoto, kanazawa];
+      const rowData = [timestamp, voter, skiing, kyoto, kanazawa, hakone, nikko, kamakura, yokohama];
 
       if (existingRow > 0) {
         // Update existing vote
@@ -134,7 +142,11 @@ function doGet(e) {
             voter: data[i][1],
             skiing: data[i][2],
             kyoto: data[i][3],
-            kanazawa: data[i][4]
+            kanazawa: data[i][4],
+            hakone: data[i][5],
+            nikko: data[i][6],
+            kamakura: data[i][7],
+            yokohama: data[i][8]
           });
         }
       }
@@ -167,7 +179,17 @@ function setupSheet() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
   // Set up header row
-  const headers = ['Timestamp', 'Voter', 'Skiing in Shiga Kogen', 'Culture in Kyoto', 'Samurai History in Kanazawa'];
+  const headers = [
+    'Timestamp',
+    'Voter',
+    'Skiing (Shiga Kogen)',
+    'Kyoto',
+    'Kanazawa',
+    'Hakone',
+    'Nikko',
+    'Kamakura',
+    'Yokohama'
+  ];
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
 
   // Format header
@@ -179,9 +201,13 @@ function setupSheet() {
   // Set column widths
   sheet.setColumnWidth(1, 150); // Timestamp
   sheet.setColumnWidth(2, 100); // Voter
-  sheet.setColumnWidth(3, 180); // Activity 1
-  sheet.setColumnWidth(4, 180); // Activity 2
-  sheet.setColumnWidth(5, 200); // Activity 3
+  sheet.setColumnWidth(3, 150); // Skiing
+  sheet.setColumnWidth(4, 120); // Kyoto
+  sheet.setColumnWidth(5, 120); // Kanazawa
+  sheet.setColumnWidth(6, 120); // Hakone
+  sheet.setColumnWidth(7, 120); // Nikko
+  sheet.setColumnWidth(8, 120); // Kamakura
+  sheet.setColumnWidth(9, 120); // Yokohama
 
   // Freeze header row
   sheet.setFrozenRows(1);
